@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: x6-user
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/x6_user
+    username: test
+    password: ${DB_PG_PWD}
