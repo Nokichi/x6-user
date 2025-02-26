@@ -15,14 +15,21 @@ public class UserRepository {
     private final UserMapper userMapper;
 
     private static final String INSERT = """
-            INSERT INTO x6.user (name, email, phone, birthday, gender)
-            VALUES (:name, :email, :phone, :birthday, :gender)
+            INSERT INTO x6.user (name, email)
+            VALUES (:name, :email)
             RETURNING *
             """;
 
     private static final String UPDATE = """
             UPDATE x6.user
-            SET name = :name, email = :email, phone = :phone, birthday = :birthday, gender = :gender, total_spent = :total_spent
+            SET name = :name, email = :email, updated_at = CURRENT_TIMESTAMP
+            WHERE id = :id
+            RETURNING *
+            """;
+
+    private static final String SET_USAGES = """
+            UPDATE x6.user
+            SET used_at = CURRENT_TIMESTAMP
             WHERE id = :id
             RETURNING *
             """;
@@ -31,6 +38,14 @@ public class UserRepository {
             SELECT *
             FROM x6.user
             WHERE id = :id
+            """;
+
+    private static final String EXISTS = """
+            SELECT EXISTS (
+                SELECT 1
+                FROM x6.user
+                WHERE id = :id
+            )
             """;
 
     public User insert(User user) {
@@ -49,15 +64,21 @@ public class UserRepository {
         }
     }
 
+    public boolean isExists(Long id) {
+        return jdbcTemplate.queryForObject(EXISTS, new MapSqlParameterSource("id", id), Boolean.class);
+    }
+
+    public User setUsages(Long id) {
+        return jdbcTemplate.queryForObject(SET_USAGES, new MapSqlParameterSource("id", id), userMapper);
+    }
+
     private MapSqlParameterSource userToSql(User user) {
         return new MapSqlParameterSource()
                 .addValue("id", user.id())
                 .addValue("name", user.name())
                 .addValue("email", user.email())
-                .addValue("phone", user.phone())
                 .addValue("created_at", user.createdAt())
-                .addValue("birthday", user.birthday())
-                .addValue("gender", user.gender().name())
-                .addValue("total_spent", user.totalSpent());
+                .addValue("updated_at", user.updatedAt())
+                .addValue("used_at", user.usedAt());
     }
 }

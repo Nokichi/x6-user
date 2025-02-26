@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.jabka.x6user.model.User;
 import ru.jabka.x6user.model.UserExists;
@@ -35,8 +36,8 @@ public class UserController {
         return userService.getById(id);
     }
 
-    @GetMapping("/exists/{id}")
-    public UserExists isUserExistsById(@PathVariable final Long id) {
+    @GetMapping("/exists")
+    public UserExists isUserExistsById(@RequestParam final Long id) {
         return userService.isUserExistsById(id);
     }
 }
